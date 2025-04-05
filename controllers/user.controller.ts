@@ -246,15 +246,19 @@ export const getUserSettings = async (req: AuthRequest, res: Response) => {
       language: "en",
       theme: "light",
       notifications: {
+        email: true,
+        push: true,
+        sms: false,
         enabledTypes: [],
-        emailNotifications: true,
-        pushNotifications: true,
+        emailNotifications: {
+          newMessage: true,
+          listingUpdates: true,
+          promotions: false,
+        },
       },
-      emailPreferences: {
-        newMessages: true,
-        listingUpdates: true,
-        promotions: false,
-      },
+      currency: "USD",
+      timezone: "UTC",
+      dateFormat: "MM/DD/YYYY",
       autoLocalization: true,
     };
 

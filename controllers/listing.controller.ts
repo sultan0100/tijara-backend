@@ -639,13 +639,12 @@ export const toggleSaveListing = async (req: AuthRequest, res: Response) => {
 
       // Create save notification
       if (req.user.id !== listing.userId) {
-        await createNotification(
-          req.app.get("io"),
-          listing.userId,
-          "LISTING_INTEREST",
-          listing.id,
-          `${req.user.username} saved your listing "${listing.title}"`,
-        );
+        await createNotification({
+          userId: listing.userId,
+          type: NotificationType.LISTING_INTEREST,
+          message: `${req.user.username} saved your listing "${listing.title}"`,
+          relatedListingId: listing.id,
+        });
       }
     }
 

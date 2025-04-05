@@ -19,6 +19,7 @@ export interface AuthRequest extends Request {
 
 // User preferences types
 export interface UserPreferences {
+  [key: string]: any; // Add index signature for Prisma JSON compatibility
   language: string;
   theme: "light" | "dark";
   notifications: {
