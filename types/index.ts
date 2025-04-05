@@ -25,6 +25,7 @@ export interface UserPreferences {
     email: boolean;
     push: boolean;
     sms: boolean;
+    enabledTypes?: string[];
   };
   currency: string;
   timezone: string;

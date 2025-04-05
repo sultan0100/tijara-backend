@@ -49,3 +49,12 @@ export enum Condition {
   POOR = 'poor',
   SALVAGE = 'salvage'
 }
+
+export enum NotificationType {
+  NEW_MESSAGE = 'NEW_MESSAGE',
+  LISTING_INTEREST = 'LISTING_INTEREST',
+  PRICE_UPDATE = 'PRICE_UPDATE',
+  LISTING_SOLD = 'LISTING_SOLD',
+  SYSTEM_NOTICE = 'SYSTEM_NOTICE',
+  LISTING_CREATED = 'LISTING_CREATED',
+}
