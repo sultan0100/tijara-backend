@@ -1,5 +1,7 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { mkdir, copyFile } from 'fs/promises';
+import { join } from 'path';
 
 const execAsync = promisify(exec);
 
@@ -8,6 +10,11 @@ async function build() {
     // Clean dist directory
     console.log('🧹 Cleaning dist directory...');
     await execAsync('rimraf dist');
+
+    // Create necessary directories
+    console.log('📁 Creating directories...');
+    await mkdir('dist', { recursive: true });
+    await mkdir('dist/prisma', { recursive: true });
 
     // Generate Prisma Client
     console.log('🔄 Generating Prisma Client...');
@@ -19,7 +26,10 @@ async function build() {
 
     // Copy Prisma schema to dist
     console.log('📋 Copying Prisma schema...');
-    await execAsync('cp prisma/schema.prisma dist/prisma/');
+    await copyFile(
+      join(process.cwd(), 'prisma/schema.prisma'),
+      join(process.cwd(), 'dist/prisma/schema.prisma')
+    );
 
     console.log('✅ Build completed successfully!');
   } catch (error) {

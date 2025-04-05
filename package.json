@@ -13,6 +13,7 @@
     "db:push": "prisma db push",
     "db:refresh": "npx prisma generate && npx prisma db push",
     "generate": "prisma generate",
+    "copy:prisma": "mkdir -p dist/prisma && cp prisma/schema.prisma dist/prisma/",
     "postinstall": "npm run build"
   },
   "dependencies": {
