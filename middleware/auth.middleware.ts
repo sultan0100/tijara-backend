@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { File } from 'multer'; 
 import jwt from "jsonwebtoken";
 import { config } from "../config/config";
 import multer from "multer";

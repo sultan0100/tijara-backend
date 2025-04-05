@@ -213,10 +213,10 @@ export const createListing = async (req: AuthRequest, res: Response) => {
         title,
         description,
         price: parseFloat(price),
-        category: {
+        category: JSON.stringify({
           mainCategory,
           subCategory,
-        },
+        }),
         location,
         condition,
         status: ListingStatus.ACTIVE,

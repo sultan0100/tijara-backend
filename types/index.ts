@@ -26,6 +26,11 @@ export interface UserPreferences {
     push: boolean;
     sms: boolean;
     enabledTypes?: string[];
+    emailNotifications?: {
+      newMessage: boolean;
+      listingUpdates: boolean;
+      promotions: boolean;
+    };
   };
   currency: string;
   timezone: string;
