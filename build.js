@@ -22,25 +22,15 @@ async function build() {
     console.log('🔄 Generating Prisma Client...');
     await execAsync('prisma generate --schema src/prisma/schema.prisma');
 
-    // Copy Prisma client files
-    console.log('📦 Copying Prisma client...');
-    const srcDir = join(process.cwd(), 'src');
+    // Create necessary directories for Prisma client
     const distPrismaPath = join(process.cwd(), 'dist', 'src');
-    
-    // Copy schema
-    try {
-      await copyFile(
-        join(srcDir, 'prisma', 'schema.prisma'),
-        join(distPrismaPath, 'prisma', 'schema.prisma')
-      );
-    } catch (err) {
-      console.warn(`⚠️  Could not copy schema.prisma: ${err.message}`);
-    }
+    const prismaClientPath = join(distPrismaPath, 'lib');
+    await mkdir(prismaClientPath, { recursive: true });
 
     // Create prismaClient.js file
     try {
-      const prismaClientPath = join(distPrismaPath, 'lib', 'prismaClient.js');
-      await writeFile(prismaClientPath, `
+      const clientFile = join(prismaClientPath, 'prismaClient.js');
+      await writeFile(clientFile, `
         import { PrismaClient } from '@prisma/client';
         
         const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
@@ -50,50 +40,49 @@ async function build() {
         if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
       `);
     } catch (err) {
-      console.warn(`⚠️  Could not create prismaClient.js: ${err.message}`);
+      console.error(`❌ Failed to create prismaClient.js: ${err.message}`);
+      throw err;
     }
 
-    // Copy the generated Prisma client from node_modules
-    try {
-      const prismaClientPath = join(process.cwd(), 'node_modules', '@prisma', 'client');
-      const distPrismaClientPath = join(distPrismaPath, 'lib', 'prisma');
-      await mkdir(distPrismaClientPath, { recursive: true });
-
-      // Copy essential files
-      const essentialFiles = ['index.js', 'package.json'];
-      for (const file of essentialFiles) {
-        try {
-          await copyFile(
-            join(prismaClientPath, file),
-            join(distPrismaClientPath, file)
-          );
-        } catch (err) {
-          console.warn(`⚠️  Could not copy ${file}: ${err.message}`);
-        }
-      }
-
-      // Copy runtime files
-      const runtimePath = join(prismaClientPath, 'runtime');
-      const distRuntimePath = join(distPrismaClientPath, 'runtime');
-      await mkdir(distRuntimePath, { recursive: true });
-
-      // Copy all runtime files
-      const runtimeFiles = await readdir(runtimePath);
-      for (const file of runtimeFiles) {
-        if (file.endsWith('.js') || file.endsWith('.d.ts')) {
-          try {
-            await copyFile(
-              join(runtimePath, file),
-              join(distRuntimePath, file)
-            );
-          } catch (err) {
-            console.warn(`⚠️  Could not copy runtime file ${file}: ${err.message}`);
-          }
-        }
-      }
-    } catch (err) {
-      console.warn(`⚠️  Could not copy Prisma client files: ${err.message}`);
-    }
+     // Copy the generated Prisma client files
+     try {
+       const srcPrismaPath = join(process.cwd(), 'node_modules', '@prisma', 'client');
+       const files = await readdir(srcPrismaPath);
+       
+       // Only copy essential files
+       const essentialFiles = ['index.js', 'package.json'];
+       
+       for (const file of essentialFiles) {
+         const srcPath = join(srcPrismaPath, file);
+         const destPath = join(prismaClientPath, file);
+         try {
+           await copyFile(srcPath, destPath);
+         } catch (err) {
+           console.warn(`⚠️  Could not copy ${file}: ${err.message}`);
+         }
+       }
+       
+       // Copy runtime files
+       const runtimePath = join(srcPrismaPath, 'runtime');
+       const destRuntimePath = join(prismaClientPath, 'runtime');
+       await mkdir(destRuntimePath, { recursive: true });
+       
+       const runtimeFiles = await readdir(runtimePath);
+       for (const file of runtimeFiles) {
+         if (file.endsWith('.js') || file.endsWith('.d.ts')) {
+           const srcPath = join(runtimePath, file);
+           const destPath = join(destRuntimePath, file);
+           try {
+             await copyFile(srcPath, destPath);
+           } catch (err) {
+             console.warn(`⚠️  Could not copy runtime file ${file}: ${err.message}`);
+           }
+         }
+       }
+     } catch (err) {
+       console.error(`❌ Failed to copy Prisma client files: ${err.message}`);
+       throw err;
+     }
 
     // Compile TypeScript
     console.log('🔨 Compiling TypeScript...');
