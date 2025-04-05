@@ -7,14 +7,13 @@
   "scripts": {
     "dev": "tsx watch server.ts",
     "clean": "rimraf dist",
-    "build": "npm run clean && node build.js",
+    "generate": "prisma generate",
+    "build": "npm run clean && npm run generate && node build.js",
     "upload:favicon": "tsx scripts/uploadFavicon.ts",
     "start": "node dist/server.js",
     "db:push": "prisma db push",
     "db:refresh": "npx prisma generate && npx prisma db push",
-    "generate": "prisma generate",
-    "copy:prisma": "mkdir -p dist/prisma && cp prisma/schema.prisma dist/prisma/",
-    "postinstall": "npm run build"
+    "postinstall": "npm run generate && npm run build"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.758.0",
