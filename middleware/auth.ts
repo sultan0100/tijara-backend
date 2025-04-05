@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import rateLimit from "express-rate-limit";
-import prisma from "../lib/prismaClient.js";
+import prisma from "../src/lib/prismaClient.js";
 import { env } from "../config/env.js";
 
 // Add JWT payload type

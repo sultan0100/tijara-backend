@@ -1,5 +1,5 @@
 import { Response } from "express";
-import prisma from "../lib/prismaClient.js";
+import prisma from "../src/lib/prismaClient.js";
 import { AuthRequest } from "../types/index.js";
 
 export const sendMessage = async (req: AuthRequest, res: Response) => {

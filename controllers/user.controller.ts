@@ -1,5 +1,5 @@
 import { Response } from "express";
-import prisma from "../lib/prismaClient.js";
+import prisma from "../src/lib/prismaClient.js";
 import bcrypt from "bcryptjs";
 import validator from "validator";
 import { uploadToR2 } from "../config/cloudflareR2.js";

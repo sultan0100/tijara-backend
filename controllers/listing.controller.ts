@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ListingStatus, ListingAction, Prisma } from "@prisma/client";
-import prisma from "../lib/prismaClient.js";
+import prisma from "../src/lib/prismaClient.js";
 import { uploadToR2, deleteFromR2 } from "../config/cloudflareR2.js";
 import fs from "fs";
 import { AuthRequest } from "../middleware/auth.middleware";

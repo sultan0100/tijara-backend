@@ -6,7 +6,7 @@ import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 import { createServer } from "node:http";
 import { Server, Socket } from "socket.io";
-import prisma from "./lib/prismaClient";
+import prisma from "./src/lib/prismaClient";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import errorHandler from "./middleware/errorHandler";

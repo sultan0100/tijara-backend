@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import jwt, { SignOptions } from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import prisma from "../lib/prismaClient.js";
+import prisma from "../src/lib/prismaClient.js";
 import { validationResult } from "express-validator";
 import { env } from "../config/env.js";
 

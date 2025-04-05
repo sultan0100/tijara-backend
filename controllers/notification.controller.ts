@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Prisma, NotificationType } from "@prisma/client";
-import prisma from "../lib/prismaClient.js";
+import prisma from "../src/lib/prismaClient.js";
 import { Server } from "socket.io";
 import { AuthRequest } from "../types/index.js";
 

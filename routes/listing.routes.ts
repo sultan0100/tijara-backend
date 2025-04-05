@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { authenticate } from "../middleware/auth";
-import prisma from "../lib/prismaClient";
+import prisma from "../src/lib/prismaClient";
 import { Prisma } from "@prisma/client";
 import { VehicleType, FuelType, TransmissionType, Condition } from "../types/enums";
 import {
