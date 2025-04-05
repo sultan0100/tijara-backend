@@ -1,7 +1,7 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { mkdir, copyFile } from 'fs/promises';
-import { join } from 'path';
+import { mkdir, copyFile, readdir, rename } from 'fs/promises';
+import { join, extname } from 'path';
 
 const execAsync = promisify(exec);
 
@@ -30,6 +30,17 @@ async function build() {
       join(process.cwd(), 'prisma/schema.prisma'),
       join(process.cwd(), 'dist/prisma/schema.prisma')
     );
+
+    // Rename .ts files to .js in dist directory
+    console.log('🔄 Renaming .ts files to .js...');
+    const files = await readdir('dist', { recursive: true });
+    for (const file of files) {
+      const filePath = join('dist', file);
+      if (extname(filePath) === '.ts') {
+        const newFilePath = filePath.replace(/\.ts$/, '.js');
+        await rename(filePath, newFilePath);
+      }
+    }
 
     console.log('✅ Build completed successfully!');
   } catch (error) {
