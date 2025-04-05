@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { mkdir, copyFile, readdir, rename } from 'fs/promises';
+import { mkdir, copyFile, readdir, rename, writeFile } from 'fs/promises';
 import { join, extname } from 'path';
 
 const execAsync = promisify(exec);
@@ -37,10 +37,26 @@ async function build() {
       console.warn(`⚠️  Could not copy schema.prisma: ${err.message}`);
     }
 
+    // Create prismaClient.js file
+    try {
+      const prismaClientPath = join(distPrismaPath, 'lib', 'prismaClient.js');
+      await writeFile(prismaClientPath, `
+        import { PrismaClient } from '@prisma/client';
+        
+        const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+        
+        export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+        
+        if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+      `);
+    } catch (err) {
+      console.warn(`⚠️  Could not create prismaClient.js: ${err.message}`);
+    }
+
     // Copy the generated Prisma client from node_modules
     try {
       const prismaClientPath = join(process.cwd(), 'node_modules', '@prisma', 'client');
-      const distPrismaClientPath = join(distPrismaPath, 'lib');
+      const distPrismaClientPath = join(distPrismaPath, 'lib', 'prisma');
       await mkdir(distPrismaClientPath, { recursive: true });
 
       // Copy essential files
@@ -58,7 +74,7 @@ async function build() {
 
       // Copy runtime files
       const runtimePath = join(prismaClientPath, 'runtime');
-      const distRuntimePath = join(distPrismaClientPath, 'prisma');
+      const distRuntimePath = join(distPrismaClientPath, 'runtime');
       await mkdir(distRuntimePath, { recursive: true });
 
       // Copy all runtime files
