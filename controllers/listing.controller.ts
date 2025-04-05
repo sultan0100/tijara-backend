@@ -4,6 +4,8 @@ import prisma from "../lib/prismaClient.js";
 import { uploadToR2, deleteFromR2 } from "../config/cloudflareR2.js";
 import fs from "fs";
 import { AuthRequest } from "../middleware/auth.middleware";
+import { createNotification } from '../utils/notification.utils';
+import { NotificationType } from '../types/enums';
 
 interface ListingResponse {
   id: string;
