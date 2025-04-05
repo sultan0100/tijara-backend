@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config";
-import { Multer } from "multer";
+import type { Multer } from "multer";
 
 export interface AuthRequest extends Request {
   user: {
@@ -10,8 +10,9 @@ export interface AuthRequest extends Request {
     username: string;
     role: string;
   };
+  file?: Express.Multer.File;
   files?: {
-    [fieldname: string]: Multer.File[];
+    [fieldname: string]: Express.Multer.File[];
   };
   processedImages?: Array<{ url: string; order: number }>;
 }

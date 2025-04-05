@@ -13,6 +13,8 @@ const mapNotificationType = (type: NotificationType): PrismaNotificationType => 
       return 'PRICE_UPDATE';
     case NotificationType.LISTING_SOLD:
       return 'LISTING_SOLD';
+    case NotificationType.LISTING_CREATED:
+      return 'LISTING_CREATED';
     case NotificationType.SYSTEM_NOTICE:
       return 'SYSTEM_NOTICE';
     default:
@@ -40,7 +42,7 @@ export const createNotification = async ({
       userId,
       type: mapNotificationType(type),
       content: message,
-      ...(relatedListingId && { relatedId: relatedListingId }),
+      relatedId: relatedListingId,
     },
   });
 };

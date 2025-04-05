@@ -282,10 +282,10 @@ export const getUserSettings = async (req: AuthRequest, res: Response) => {
  */
 export const updateUserSettings = async (req: AuthRequest, res: Response) => {
   try {
-    const { preferences } = req.body as { preferences: UserPreferences };
+    const { preferences } = req.body;
 
     // Validate preferences structure
-    if (!preferences || typeof preferences !== "object") {
+    if (!preferences || typeof preferences !== 'object') {
       return res.status(400).json({
         success: false,
         error: "Invalid preferences format",
@@ -294,27 +294,54 @@ export const updateUserSettings = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Convert preferences to Prisma.JsonValue
-    const preferencesJson = JSON.parse(
-      JSON.stringify(preferences),
-    ) as unknown as Prisma.JsonValue;
+    // Ensure preferences has the correct structure
+    const defaultPreferences: UserPreferences = {
+      language: "en",
+      theme: "light",
+      notifications: {
+        email: true,
+        push: true,
+        sms: false,
+        enabledTypes: [],
+        emailNotifications: {
+          newMessage: true,
+          listingUpdates: true,
+          promotions: true
+        }
+      },
+      currency: "USD",
+      timezone: "UTC",
+      dateFormat: "MM/DD/YYYY"
+    };
+
+    // Merge with defaults to ensure all required fields are present
+    const updatedPreferences = {
+      ...defaultPreferences,
+      ...preferences,
+      notifications: {
+        ...defaultPreferences.notifications,
+        ...(preferences.notifications || {}),
+        emailNotifications: {
+          ...defaultPreferences.notifications.emailNotifications,
+          ...(preferences.notifications?.emailNotifications || {})
+        }
+      }
+    } as UserPreferences;
 
     const updatedUser = await prisma.user.update({
       where: { id: req.user.id },
       data: {
-        preferences: preferencesJson as Prisma.InputJsonValue,
-      },
+        preferences: updatedPreferences
+      }
     });
 
     res.status(200).json({
       success: true,
-      data: {
-        preferences: updatedUser.preferences,
-      },
+      data: updatedUser,
       status: 200,
     });
   } catch (error) {
-    console.error("Error updating user settings:", error);
+    console.error("Settings update error:", error);
     res.status(500).json({
       success: false,
       error: "Error updating user settings",

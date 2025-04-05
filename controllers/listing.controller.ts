@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ListingStatus, ListingAction, Prisma, NotificationType } from "@prisma/client";
+import { ListingStatus, ListingAction, Prisma } from "@prisma/client";
 import prisma from "../lib/prismaClient.js";
 import { uploadToR2, deleteFromR2 } from "../config/cloudflareR2.js";
 import fs from "fs";
@@ -281,15 +281,11 @@ export const createListing = async (req: AuthRequest, res: Response) => {
       });
 
       // Create notification
-      const notificationData: NotificationCreateInput = {
+      await createNotification({
+        userId: listing.userId,
         type: NotificationType.LISTING_CREATED,
-        userId: req.user.id,
-        content: `Your listing "${listing.title}" has been successfully created.`,
+        message: `Your listing "${listing.title}" has been created successfully.`,
         relatedListingId: listing.id
-      };
-
-      await tx.notification.create({
-        data: notificationData,
       });
 
       return listing;
@@ -422,13 +418,12 @@ export const getListing = async (req: AuthRequest, res: Response) => {
 
     // Create view notification if viewer is not the seller
     if (req.user && req.user.id !== listing.userId) {
-      await createNotification(
-        req.app.get("io"),
-        listing.userId,
-        "LISTING_INTEREST",
-        listing.id,
-        `${req.user.username} viewed your listing "${listing.title}"`,
-      );
+      await createNotification({
+        userId: listing.userId,
+        type: NotificationType.LISTING_INTEREST,
+        message: `${req.user.username} viewed your listing "${listing.title}"`,
+        relatedListingId: listing.id
+      });
     }
 
     res.json({
@@ -458,6 +453,20 @@ export const updateListing = async (req: AuthRequest, res: Response) => {
       attributes,
       features,
     } = req.body;
+
+    const oldListing = await prisma.listing.findUnique({
+      where: { id },
+      select: { price: true, title: true }
+    });
+
+    if (!oldListing) {
+      return res.status(404).json({
+        success: false,
+        error: "Listing not found",
+        status: 404,
+        data: null,
+      });
+    }
 
     const listing = await prisma.listing.update({
       where: { id },
@@ -505,6 +514,16 @@ export const updateListing = async (req: AuthRequest, res: Response) => {
         features: true,
       },
     });
+
+    // Create notification for price update
+    if (oldListing.price !== parseFloat(price)) {
+      await createNotification({
+        userId: listing.userId,
+        type: NotificationType.PRICE_UPDATE,
+        message: `The price of your listing "${oldListing.title}" has been updated from ${oldListing.price} to ${price}.`,
+        relatedListingId: listing.id
+      });
+    }
 
     res.json({
       success: true,

@@ -154,6 +154,7 @@ enum NotificationType {
   PRICE_UPDATE
   LISTING_SOLD
   SYSTEM_NOTICE
+  LISTING_CREATED
 }
 
 // Flexible Attributes System
