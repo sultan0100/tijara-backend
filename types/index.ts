@@ -26,7 +26,7 @@ export interface UserPreferences {
     push: boolean;
     sms: boolean;
     enabledTypes?: string[];
-    emailNotifications?: {
+    emailNotifications: {
       newMessage: boolean;
       listingUpdates: boolean;
       promotions: boolean;

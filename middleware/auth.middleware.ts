@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config";
-import multer, { File } from "multer";
+import { File } from "multer";
 
 export interface AuthRequest extends Request {
   user: {
