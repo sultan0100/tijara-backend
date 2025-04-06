@@ -6,11 +6,11 @@ import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 import { createServer } from "node:http";
 import { Server, Socket } from "socket.io";
-import prisma from "./src/lib/prismaClient";
+import prisma from "./src/lib/prismaClient.js";
 import dotenv from "dotenv";
 import morgan from "morgan";
-import errorHandler from "./middleware/errorHandler";
-import { getDirname } from "./utils/path.utils";
+import errorHandler from "./middleware/errorHandler.js";
+import { getDirname } from "./utils/path.utils.js";
 const __dirname = getDirname(import.meta.url);
 
 // Load environment variables
@@ -35,8 +35,8 @@ const limiter = rateLimit({
     success: false,
     error: {
       code: "RATE_LIMIT",
-      message: "Too many requests from this IP, please try again later."
-    }
+      message: "Too many requests from this IP, please try again later.",
+    },
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -49,29 +49,29 @@ app.use("/api/auth/register", limiter);
 // CORS Configuration
 const corsOptions = {
   origin: [
-    'https://tijara-frontend-ashk4pprf-darians-projects-e6352288.vercel.app',
-    'https://tijara-frontend-production.up.railway.app',
-    'http://localhost:3000',  // For local development
-    'http://localhost:5173',  // For Vite's default port
-    'http://localhost:3001',  // Alternative port
-    'http://127.0.0.1:3000',  // Alternative localhost
-    'http://127.0.0.1:5173',  // Alternative localhost
-    'http://127.0.0.1:3001'   // Alternative localhost
+    "https://tijara-frontend-ashk4pprf-darians-projects-e6352288.vercel.app",
+    "https://tijara-frontend-production.up.railway.app",
+    "http://localhost:3000", // For local development
+    "http://localhost:5173", // For Vite's default port
+    "http://localhost:3001", // Alternative port
+    "http://127.0.0.1:3000", // Alternative localhost
+    "http://127.0.0.1:5173", // Alternative localhost
+    "http://127.0.0.1:3001", // Alternative localhost
   ],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: [
-    'Content-Type',
-    'Authorization',
-    'X-Requested-With',
-    'Accept',
-    'Origin',
-    'Access-Control-Allow-Headers',
-    'Access-Control-Allow-Origin',
-    'Access-Control-Allow-Credentials'
+    "Content-Type",
+    "Authorization",
+    "X-Requested-With",
+    "Accept",
+    "Origin",
+    "Access-Control-Allow-Headers",
+    "Access-Control-Allow-Origin",
+    "Access-Control-Allow-Credentials",
   ],
-  exposedHeaders: ['Content-Range', 'X-Content-Range'],
-  maxAge: 600 // Cache preflight request results for 10 minutes
+  exposedHeaders: ["Content-Range", "X-Content-Range"],
+  maxAge: 600, // Cache preflight request results for 10 minutes
 };
 
 // Apply CORS middleware
@@ -86,8 +86,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // Logging
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
 }
 
 // Add before your routes
@@ -97,7 +97,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     body: req.body,
     query: req.query,
   });
-  
+
   // Log response
   const originalSend = res.send;
   res.send = function (body: any) {
@@ -106,7 +106,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     });
     return originalSend.call(this, body);
   };
-  
+
   next();
 });
 
@@ -122,12 +122,12 @@ app.get("/api/health", (req: Request, res: Response) => {
 });
 
 // Import Routes
-import authRoutes from "./routes/auth.routes";
-import listingRoutes from "./routes/listing.routes";
-import userRoutes from "./routes/user.routes";
-import messageRoutes from "./routes/message.routes";
-import uploadRoutes from "./routes/uploads";
-import notificationRoutes from "./routes/notification.routes";
+import authRoutes from "./routes/auth.routes.js";
+import listingRoutes from "./routes/listing.routes.js";
+import userRoutes from "./routes/user.routes.js";
+import messageRoutes from "./routes/message.routes.js";
+import uploadRoutes from "./routes/uploads.js";
+import notificationRoutes from "./routes/notification.routes.js";
 
 // API routes
 app.use("/api/auth", authRoutes);
@@ -146,8 +146,8 @@ app.use((req: Request, res: Response) => {
     success: false,
     error: {
       code: "NOT_FOUND",
-      message: "Route not found"
-    }
+      message: "Route not found",
+    },
   });
 });
 
@@ -193,10 +193,10 @@ async function startServer() {
 
     // Start server
     const port = process.env.PORT || 5000;
-    
+
     httpServer.listen(port, () => {
       console.log(`🚀 Server running on port ${port}`);
-      console.log('Environment:', process.env.NODE_ENV);
+      console.log("Environment:", process.env.NODE_ENV);
     });
   } catch (error) {
     console.error("❌ Failed to start server:", error);

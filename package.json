@@ -8,7 +8,7 @@
     "dev": "tsx watch server.ts",
     "clean": "rimraf dist",
     "generate": "prisma generate --schema src/prisma/schema.prisma",
-    "build": "npm run clean && npm run generate && node build.js",
+    "build": "npm run clean && npm run generate && tsc",
     "upload:favicon": "tsx scripts/uploadFavicon.ts",
     "start": "node dist/server.js",
     "db:push": "prisma db push --schema src/prisma/schema.prisma",
