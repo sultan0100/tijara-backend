@@ -1,57 +1,65 @@
 import express from "express";
-import { authenticate } from "../middleware/auth";
+import { authenticate } from "../middleware/auth.js";
 import {
-  updateProfile,
-  getUserProfile,
-  getUserListings,
-  getUserSettings,
-  updateUserSettings,
-} from "../controllers/user.controller";
+   updateProfile,
+   getUserProfile,
+   getUserListings,
+   getUserSettings,
+   updateUserSettings,
+} from "../controllers/user.controller.js";
 import {
-  upload,
-  processImage,
-  uploadToR2,
-} from "../middleware/upload.middleware";
+   upload,
+   processImage,
+   uploadToR2,
+} from "../middleware/upload.middleware.js";
 
 // Define AuthRequest type for type safety
 interface AuthRequest extends express.Request {
-  user: {
-    id: string;
-    email: string;
-    username: string;
-    role: string;
-  };
-  file?: Express.Multer.File;
+   user: {
+      id: string;
+      email: string;
+      username: string;
+      role: string;
+   };
+   file?: Express.Multer.File;
 }
 
 const router = express.Router();
 
 // Type-safe request handler wrapper
 const asyncHandler = <T>(
-  fn: (req: AuthRequest, res: express.Response, next: express.NextFunction) => Promise<T>
+   fn: (
+      req: AuthRequest,
+      res: express.Response,
+      next: express.NextFunction
+   ) => Promise<T>
 ) => {
-  return async (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ): Promise<void> => {
-    try {
-      await fn(req as AuthRequest, res, next);
-    } catch (error) {
-      next(error);
-    }
-  };
+   return async (
+      req: express.Request,
+      res: express.Response,
+      next: express.NextFunction
+   ): Promise<void> => {
+      try {
+         await fn(req as AuthRequest, res, next);
+      } catch (error) {
+         next(error);
+      }
+   };
 };
 
 // Middleware to process profile picture
 const processProfilePicture = asyncHandler(
-  async (req: AuthRequest, res: express.Response, next: express.NextFunction): Promise<void> => {
-    if (req.file) {
-      // Upload processed image to R2
-      req.body.profilePicture = await uploadToR2(req.file, "avatar");
-    }
-    next();
-  }
+   async (
+      req: AuthRequest,
+      res: express.Response,
+      next: express.NextFunction
+   ): Promise<void> => {
+      if (req.file) {
+         // Upload processed image to R2
+         req.body.profilePicture = await uploadToR2(req.file, "avatar");
+      }
+      next();
+   }
 );
 
 // ✅ Ensure all routes require authentication
@@ -62,10 +70,10 @@ router.get("/profile", asyncHandler(getUserProfile));
 
 // ✅ Update profile (optional profile picture upload)
 router.put(
-  "/profile",
-  upload.single("profilePicture"),
-  processProfilePicture,
-  asyncHandler(updateProfile),
+   "/profile",
+   upload.single("profilePicture"),
+   processProfilePicture,
+   asyncHandler(updateProfile)
 );
 
 // ✅ Get user settings
